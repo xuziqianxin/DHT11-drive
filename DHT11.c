@@ -1,29 +1,29 @@
 /**
- * @file    DHT11.c
- * @brief   This file provides code for initializing and using the functions of the DHT11.
- * @author  虚字潜心(xu_zi_qian_xin)
- * @version 1.0.0
- * @date    2026-02-23
- * 
- * @copyright Copyright (c) 2026 虚字潜心. All rights reserved.
- * @license  SPDX-License-Identifier: MIT
- */
+  * @file    DHT11.c
+  * @brief   This file provides code for initializing and using the functions of the DHT11.
+  * @author  虚字潜心(xu_zi_qian_xin)
+  * @version 1.0.0
+  * @date    2026-02-23
+  * 
+  * @copyright Copyright (c) 2026 虚字潜心. All rights reserved.
+  * @license  SPDX-License-Identifier: MIT
+  */
 
 #include "DHT11.h"
 
 /**
-	* @breif Used to convert the BCD code sent by the device into an integer value.
-	* @param bcd 1-byte data sent to the device as a parameter.
-	*/
+  * @breif Used to convert the BCD code sent by the device into an integer value.
+  * @param bcd 1-byte data sent to the device as a parameter.
+  */
 static inline uint8_t BCD_To_Int(uint8_t bcd)
 {
 	return ((bcd >> 4) * 10) + (bcd & 0xFF);
 }
 
 /**
-	* @breif Used to convert BCD codes sent by the device into floating-point values
-	* @param bcd 1-byte data sent to the device as a parameter.
-	*/
+  * @breif Used to convert BCD codes sent by the device into floating-point values
+  * @param bcd 1-byte data sent to the device as a parameter.
+  */
 static inline double BCD_To_Float(uint8_t bcd)
 {
 	uint8_t value = BCD_To_Int(bcd);
@@ -31,11 +31,11 @@ static inline double BCD_To_Float(uint8_t bcd)
 }
 
 /**
-	* @breif Get the temperature and humidity values from the DHT11.
-	* @param DHT11 Device structure.
-	* @param temperature Address of the temperature variable.
-	* @param humidityAddress of the humidity variable.
-	*/
+  * @breif Get the temperature and humidity values from the DHT11.
+  * @param DHT11 Device structure.
+  * @param temperature Address of the temperature variable.
+  * @param humidityAddress of the humidity variable.
+  */
 uint32_t DHT11_Get_Value(DHT11_Typedef DHT11, double *temperature, double *humidity)
 {
 	uint8_t data[5] = { 0 };
