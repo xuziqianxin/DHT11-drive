@@ -15,20 +15,26 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
-/* IIC LIB Includes ----------------------------------------------------------*/
+/* Includes -----------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
 
 /* Typedef ------------------------------------------------------------*/
+/**
+	* @breif DHT11 structure, 32-bit pointer passing the address of the IO port.
+	*/
 typedef struct DHT11_Port
 {
 	uint32_t *GPIO_Port;
 	uint16_t GPIO_Pin;
 } DHT11_Typedef;
 
+/**
+	* @breif List of Bus Communication Errors.
+	*/
 typedef enum 
 {
-	NORMAL,
+	NORMAL = 0U,
 	TIME_OUT_TGO,
 	TIME_OUT_TREL,
 	TIME_OUT_TREH,
@@ -40,35 +46,52 @@ typedef enum
 } DHT11_STATUS;
 
 /* Define ------------------------------------------------------------*/
+/**
+	* @breif This parameter is used to correct the microsecond delay time. 
+	* 			 When porting, modify the value to the precise time of a 1µs delay for your delay function. 
+	* 			 For example, the default precise time for a 1µs delay is 1.46µs.
+	*/
 #define US_CORRECTION_PARAMETER 1.46
 
+/**
+	* @breif The unit used to select the delay time is milliseconds or microseconds, no modification is needed.
+	*/
 #define TIME_UNIT_US 1
 #define TIME_UNIT_MS 0
 
-#define NORMAL 			0
-#define TIME_OUT 		1
-#define DATA_ERROR 	2
-#define LINE_ERROR  3
-
-#define GPIO_OUTPUT(devicePort) \
+/**
+	* @breif This macro is used to set the specified pin to output mode, rewrite according to your platform.
+	* @param devicePort IO ports used by the device
+	* @param devicePinNum Pins used by the device
+	*/
+#define __DHT11_GPIO_OUTPUT(devicePort, devicePinNum) \
 do{ \
 	GPIO_InitTypeDef GPIO_InitStruct = {0}; \
-	GPIO_InitStruct.Pin = devicePort; \
+	GPIO_InitStruct.Pin = devicePinNum; \
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; \
   GPIO_InitStruct.Pull = GPIO_NOPULL; \
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; \
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); \
+  HAL_GPIO_Init((GPIO_TypeDef *)devicePort, &GPIO_InitStruct); \
 }while(0)
 
-#define GPIO_INPUT(devicePort) \
+/**
+	* @breif This macro is used to set the specified pin to input mode, rewrite according to your platform.
+	* @param devicePort IO ports used by the device
+	* @param devicePinNum Pins used by the device
+	*/
+#define __DHT11_GPIO_INPUT(devicePort, devicePinNum) \
 do{ \
 	GPIO_InitTypeDef GPIO_InitStruct = {0}; \
-	GPIO_InitStruct.Pin = devicePort; \
+	GPIO_InitStruct.Pin = devicePinNum; \
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT; \
   GPIO_InitStruct.Pull = GPIO_NOPULL; \
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); \
+  HAL_GPIO_Init((GPIO_TypeDef *)devicePort, &GPIO_InitStruct); \
 }while(0)
 
+/**
+	* @breif This macro performs microsecond and millisecond delays, please rewrite it according to your platform when porting.
+	* @param unit Select the time unit for the delay.
+	*/
 #define Delay(unit) \
 do{ \
 	if(unit) \
@@ -97,6 +120,11 @@ do{ \
 	} \
 }while(0)
 
+/**
+	* @breif This macro is used for IO read and write and should be rewritten according to the specific platform.
+	* @param devicePort IO ports used by the device
+	* @param devicePinNum Pins used by the device
+	*/
 #define __READ_BIT(devicePort, devicePinNum) HAL_GPIO_ReadPin((GPIO_TypeDef *)devicePort, devicePinNum)
 #define __WRITE_BIT_SET(devicePort, devicePinNum) HAL_GPIO_WritePin((GPIO_TypeDef *)devicePort, devicePinNum, GPIO_PIN_SET)
 #define __WRITE_BIT_RESET(devicePort, devicePinNum) HAL_GPIO_WritePin((GPIO_TypeDef *)devicePort, devicePinNum, GPIO_PIN_RESET)
