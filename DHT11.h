@@ -16,8 +16,8 @@
 extern "C"{
 #endif
 /* Includes -----------------------------------------------------------*/
-#include "main.h"
-#include "gpio.h"
+#include "debug.h"
+#include "ch32v30x_gpio.h"
 
 /* Typedef ------------------------------------------------------------*/
 /**
@@ -67,11 +67,10 @@ typedef enum
 #define __DHT11_GPIO_OUTPUT(devicePort, devicePinNum) \
 do{ \
 	GPIO_InitTypeDef GPIO_InitStruct = {0}; \
-	GPIO_InitStruct.Pin = devicePinNum; \
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; \
-  GPIO_InitStruct.Pull = GPIO_NOPULL; \
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; \
-  HAL_GPIO_Init((GPIO_TypeDef *)devicePort, &GPIO_InitStruct); \
+	GPIO_InitStruct.GPIO_Pin = devicePinNum; \
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP; \
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz; \
+  GPIO_Init((GPIO_TypeDef *)devicePort, &GPIO_InitStruct); \
 }while(0)
 
 /**
@@ -82,10 +81,9 @@ do{ \
 #define __DHT11_GPIO_INPUT(devicePort, devicePinNum) \
 do{ \
 	GPIO_InitTypeDef GPIO_InitStruct = {0}; \
-	GPIO_InitStruct.Pin = devicePinNum; \
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT; \
-  GPIO_InitStruct.Pull = GPIO_NOPULL; \
-  HAL_GPIO_Init((GPIO_TypeDef *)devicePort, &GPIO_InitStruct); \
+	GPIO_InitStruct.GPIO_Pin = devicePinNum; \
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU; \
+  GPIO_Init((GPIO_TypeDef *)devicePort, &GPIO_InitStruct); \
 }while(0)
 
 /**
@@ -96,27 +94,11 @@ do{ \
 do{ \
 	if(unit) \
 	{ \
-		uint32_t ticks = SystemCoreClock / 1000000UL; \
-		uint32_t reload = SysTick->LOAD; \
-		uint32_t start  = SysTick->VAL; \
-		uint32_t elapsed = 0; \
-		while (elapsed < ticks) \
-		{ \
-			uint32_t current = SysTick->VAL; \
-			if(current <= start) \
-			{ \
-					elapsed += start - current; \
-			} \
-			else \
-			{ \
-					elapsed += reload - current + start; \
-			} \
-			start = current; \
-		} \
+    Delay_Us(1); \
 	} \
 	else \
 	{ \
-		HAL_Delay(0); \
+		Delay_Ms(1); \
 	} \
 }while(0)
 
@@ -125,9 +107,9 @@ do{ \
   * @param devicePort IO ports used by the device
   * @param devicePinNum Pins used by the device
   */
-#define __READ_BIT(devicePort, devicePinNum) HAL_GPIO_ReadPin((GPIO_TypeDef *)devicePort, devicePinNum)
-#define __WRITE_BIT_SET(devicePort, devicePinNum) HAL_GPIO_WritePin((GPIO_TypeDef *)devicePort, devicePinNum, GPIO_PIN_SET)
-#define __WRITE_BIT_RESET(devicePort, devicePinNum) HAL_GPIO_WritePin((GPIO_TypeDef *)devicePort, devicePinNum, GPIO_PIN_RESET)
+#define __READ_BIT(devicePort, devicePinNum) GPIO_ReadInputDataBit((GPIO_TypeDef *)devicePort, devicePinNum)
+#define __WRITE_BIT_SET(devicePort, devicePinNum) GPIO_WriteBit((GPIO_TypeDef *)devicePort, devicePinNum, Bit_SET)
+#define __WRITE_BIT_RESET(devicePort, devicePinNum) GPIO_WriteBit((GPIO_TypeDef *)devicePort, devicePinNum, Bit_RESET)
 
 /* Function ------------------------------------------------------------*/
 uint32_t DHT11_Get_Value(DHT11_Typedef DHT11, double *temperature, double *humidity);
