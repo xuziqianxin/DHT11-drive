@@ -2,33 +2,22 @@
 DHT11的驱动库，移植快捷
 使用示例（本驱动库支持多机管理）：
 ```
-#include "stdio.h"
+// 使用官方例程 CH32V307EVT\EVT\EXAM\GPIO\GPIO_Toggle
 #include "DHT11.h"
 
-DHT11_Typedef DHT11 = { 0 };
+DHT11_Typedef DHT11 = {(uint32_t *)GPIOA, GPIO_Pin_0};
 double temperature = 0;
 double humidity = 0;
-uint8_t string[20] = { 0 };
-uint32_t retval = 0;
+uint32_t Ecode = 0;
 
 int main()
 {
   // 省略初始化......
-  DHT11.GPIO_Port = (uint32_t *)GPIOA;
   while(1)
   {
-    // 1号脚的DHT11
-		DHT11.GPIO_Pin = GPIO_PIN_1;
-		retval = DHT11_Get_Value(DHT11, &temperature, &humidity);
-		sprintf((char *)string, "%d T:%.2lf	H:%.2lf \n", retval, temperature, humidity);
-		HAL_UART_Transmit(&huart1, string, sizeof(string), 0xff);
-
-    // 2号脚的DHT11
-		DHT11.GPIO_Pin = GPIO_PIN_2;
-		retval = DHT11_Get_Value(DHT11, &temperature, &humidity);
-		sprintf((char *)string, "%d T:%.2lf	H:%.2lf \n", retval, temperature, humidity);
-		HAL_UART_Transmit(&huart1, string, sizeof(string), 0xff);
-		HAL_Delay(200);
+        Ecode = DHT11_Get_Value(DHT11, &temperature, &humidity);
+        printf("Ecode %d T: %.2lf H: %.2lf\n", Ecode, temperature, humidity);
+        Delay_Ms(100);
   }
 }
 ```
